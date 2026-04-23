@@ -1,0 +1,843 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LINE Sender Pro</title>
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --g:#06C755;--gd:#04a344;--gp:#eafaf1;--gm:#c3f0d6;
+  --bg:#eef0f4;--s:#fff;--s2:#f7f8fa;--s3:#eff1f5;
+  --bd:#e2e6ee;--bd2:#c5cdd9;
+  --t:#0d1117;--t2:#4b5563;--t3:#9ca3af;
+  --red:#ef4444;--rp:#fef2f2;--rm:#fecaca;
+  --blue:#3b82f6;--bp:#eff6ff;--bm:#bfdbfe;
+  --r:14px;--rs:9px;--rxs:6px;
+  --sh:0 1px 4px rgba(0,0,0,.07),0 1px 2px rgba(0,0,0,.04);
+  --shd:0 8px 24px rgba(0,0,0,.11);
+}
+html{scroll-behavior:smooth}
+body{font-family:'Sarabun',sans-serif;background:var(--bg);color:var(--t);font-size:15px;line-height:1.6;min-height:100vh}
+
+/* NAV */
+nav{height:58px;background:var(--s);border-bottom:1px solid var(--bd);display:flex;align-items:center;justify-content:space-between;padding:0 28px;position:sticky;top:0;z-index:300;box-shadow:var(--sh)}
+.logo{display:flex;align-items:center;gap:10px}
+.logo-box{width:36px;height:36px;background:var(--g);border-radius:10px;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(6,199,85,.35)}
+.logo-box svg{width:22px;height:22px;fill:#fff}
+.logo-text{font-size:16px;font-weight:700;letter-spacing:-.3px}
+.logo-text em{font-style:normal;font-weight:300;color:var(--t3);font-size:13px;margin-left:6px}
+.conn-pill{display:flex;align-items:center;gap:7px;background:var(--s2);border:1px solid var(--bd);border-radius:100px;padding:5px 14px;font-size:12px;color:var(--t3)}
+.conn-pill.ok{background:var(--gp);border-color:var(--gm);color:#0a7a32}
+.cdot{width:7px;height:7px;border-radius:50%;background:var(--bd2);flex-shrink:0}
+.cdot.live{background:var(--g);animation:pulse 2s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+
+/* LAYOUT */
+.wrap{max-width:1180px;margin:0 auto;padding:24px 20px;display:grid;grid-template-columns:400px 1fr;gap:20px;align-items:start}
+@media(max-width:860px){.wrap{grid-template-columns:1fr}}
+.panel{display:flex;flex-direction:column;gap:16px}
+
+/* BOX */
+.box{background:var(--s);border:1px solid var(--bd);border-radius:var(--r);box-shadow:var(--sh);overflow:hidden}
+.bh{display:flex;align-items:center;gap:8px;padding:14px 18px;border-bottom:1px solid var(--bd);background:var(--s2)}
+.bh-ico{width:28px;height:28px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0}
+.bh-title{font-size:13.5px;font-weight:700;letter-spacing:-.1px}
+.bh-extra{margin-left:auto;font-size:11.5px;color:var(--t3)}
+.bb{padding:18px}
+
+/* SEARCH */
+.srch{position:relative}
+.srch-ico{position:absolute;left:12px;top:50%;transform:translateY(-50%);pointer-events:none;color:var(--t3)}
+.srch-ico svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round}
+.srch input{padding:10px 38px 10px 36px;font-size:15px;border-radius:var(--rs);border:1.5px solid var(--bd2);width:100%;outline:none;font-family:'Sarabun',sans-serif;color:var(--t);background:var(--s);transition:border-color .15s,box-shadow .15s}
+.srch input:focus{border-color:var(--g);box-shadow:0 0 0 3px rgba(6,199,85,.13)}
+.srch input:disabled{background:var(--s3);color:var(--t3)}
+.srch-x{position:absolute;right:10px;top:50%;transform:translateY(-50%);width:22px;height:22px;border-radius:50%;border:none;background:var(--s3);color:var(--t3);cursor:pointer;display:none;align-items:center;justify-content:center;font-size:15px;line-height:1}
+.srch-x.on{display:flex}
+
+/* MEMBER LIST */
+.mlist{margin-top:10px;display:flex;flex-direction:column;gap:5px;max-height:330px;overflow-y:auto;padding-right:2px}
+.mlist::-webkit-scrollbar{width:4px}
+.mlist::-webkit-scrollbar-thumb{background:var(--bd2);border-radius:2px}
+.mcard{display:flex;align-items:center;gap:11px;padding:10px 13px;border-radius:var(--rs);border:1.5px solid var(--bd);cursor:pointer;transition:border-color .13s,background .13s,box-shadow .13s;background:var(--s);user-select:none}
+.mcard:hover{border-color:var(--g);background:var(--gp)}
+.mcard.sel{border-color:var(--g);background:var(--gp);box-shadow:0 0 0 3px rgba(6,199,85,.12)}
+.ava{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;color:#fff;flex-shrink:0;letter-spacing:-.5px}
+.minfo{flex:1;min-width:0}
+.mname{font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mdept{font-size:11.5px;color:var(--t2);background:var(--s3);border-radius:100px;padding:1px 9px;display:inline-block;margin-top:2px}
+.muid{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--t3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:160px}
+.mchk{width:20px;height:20px;border-radius:50%;border:2px solid var(--bd2);flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .13s;background:var(--s)}
+.mcard.sel .mchk{background:var(--g);border-color:var(--g)}
+.mchk svg{width:10px;height:10px;fill:none;stroke:#fff;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round;opacity:0;transition:opacity .13s}
+.mcard.sel .mchk svg{opacity:1}
+.empty{text-align:center;padding:30px 0;color:var(--t3);font-size:13px}
+.empty .ei{font-size:30px;margin-bottom:7px}
+
+/* TAGS */
+.tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px;min-height:0}
+.tag{display:inline-flex;align-items:center;gap:5px;background:var(--gp);border:1px solid var(--gm);color:#0a6b2b;font-size:12px;font-weight:600;padding:3px 10px;border-radius:100px}
+.tx{cursor:pointer;font-size:14px;line-height:1;opacity:.55;margin-left:1px}
+.tx:hover{opacity:1}
+
+/* FORM ELEMENTS */
+label{display:block;font-size:12px;font-weight:700;color:var(--t2);margin-bottom:5px;letter-spacing:.03em}
+input[type=text],input[type=url],textarea{width:100%;padding:9px 12px;border:1.5px solid var(--bd2);border-radius:var(--rs);font-family:'Sarabun',sans-serif;font-size:14px;color:var(--t);background:var(--s);outline:none;transition:border-color .15s,box-shadow .15s}
+input[type=text]:focus,input[type=url]:focus,textarea:focus{border-color:var(--g);box-shadow:0 0 0 3px rgba(6,199,85,.12)}
+textarea{resize:vertical;min-height:115px;line-height:1.65}
+.field{margin-bottom:15px}
+.field:last-child{margin-bottom:0}
+
+/* DRAFT PILLS */
+.draft-row{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:13px}
+.dp{padding:5px 15px;border-radius:100px;border:1.5px solid var(--bd);font-size:12.5px;font-weight:600;cursor:pointer;transition:all .13s;background:var(--s);color:var(--t2)}
+.dp:hover{border-color:var(--g);color:var(--g);background:var(--gp)}
+.dp.on{border-color:var(--g);background:var(--g);color:#fff}
+
+/* MODE TABS */
+.mode-tabs{display:grid;grid-template-columns:repeat(4,1fr);background:var(--s3);border-radius:var(--rs);padding:4px;gap:4px;margin-bottom:16px}
+.mt{flex:1;padding:7px 4px;border-radius:7px;border:none;font-family:'Sarabun',sans-serif;font-size:12px;font-weight:600;cursor:pointer;transition:all .15s;background:transparent;color:var(--t3);text-align:center;line-height:1.3}
+.mt.on{background:var(--s);color:var(--t);box-shadow:var(--sh)}
+
+/* MSG META */
+.msg-meta{display:flex;justify-content:space-between;align-items:center;margin-top:5px}
+.cc{font-size:11.5px;color:var(--t3)}
+.hint-chips{display:flex;gap:5px}
+.chip{font-size:11px;font-weight:600;color:var(--t2);background:var(--s3);border:1px solid var(--bd);padding:2px 9px;border-radius:5px;cursor:pointer;transition:all .12s}
+.chip:hover{border-color:var(--g);color:var(--g);background:var(--gp)}
+
+/* FLEX SECTION */
+.flex-section{border-top:1px solid var(--bd);padding-top:16px;margin-top:4px}
+.color-grid{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}
+.sw{width:30px;height:30px;border-radius:50%;cursor:pointer;border:3px solid transparent;transition:all .15s;position:relative}
+.sw.on{border-color:#0d1117;transform:scale(1.18)}
+.sw.on::after{content:'✓';position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px;font-weight:700}
+
+/* LINK TOGGLE */
+.link-toggle{display:flex;align-items:center;gap:8px;padding:10px 14px;background:var(--s3);border-radius:var(--rxs);cursor:pointer;margin-bottom:10px;user-select:none;border:1.5px solid var(--bd);transition:all .13s}
+.link-toggle:hover{border-color:var(--blue);background:var(--bp)}
+.link-toggle.on{border-color:var(--blue);background:var(--bp)}
+.lt-ico{font-size:14px}
+.lt-label{font-size:13px;font-weight:600;color:var(--t2);flex:1}
+.lt-badge{font-size:11px;background:var(--blue);color:#fff;padding:1px 8px;border-radius:100px;display:none}
+.link-toggle.on .lt-badge{display:inline}
+.link-body{display:none;margin-top:0}
+.link-body.show{display:block}
+.link-row{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:end}
+.btn-del-link{padding:9px 14px;border-radius:var(--rs);border:1.5px solid var(--rm);background:var(--rp);color:var(--red);font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap;transition:all .12s;font-family:'Sarabun',sans-serif}
+.btn-del-link:hover{background:var(--red);color:#fff}
+
+/* PREVIEW */
+.prev-wrap{margin-top:14px}
+.prev-lbl{font-size:11px;font-weight:700;color:var(--t3);letter-spacing:.06em;text-transform:uppercase;margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.prev-lbl::before,.prev-lbl::after{content:'';flex:1;height:1px;background:var(--bd)}
+.flex-card{border-radius:16px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,.14);max-width:300px;margin:0 auto;font-family:'Sarabun',sans-serif}
+.fc-hd{padding:16px 18px}
+.fc-hd-sub{font-size:11px;color:rgba(255,255,255,.7);margin-bottom:3px}
+.fc-hd-name{font-size:17px;font-weight:700;color:#fff;line-height:1.3}
+.fc-hd-dept{font-size:11px;color:rgba(255,255,255,.7);margin-top:3px}
+.fc-body{background:#fff;padding:16px 18px;font-size:13.5px;color:#222;line-height:1.65;white-space:pre-wrap;min-height:48px}
+.fc-link{background:#fff;padding:0 18px 16px;display:none}
+.fc-link.show{display:block}
+.fc-link-btn{display:block;padding:9px;border-radius:10px;text-align:center;font-size:13px;font-weight:700;color:#fff;text-decoration:none}
+.fc-foot{background:#f9f9f9;padding:10px 18px;font-size:11px;color:#bbb;text-align:center}
+
+/* IMAGE SECTION */
+.img-section{border-top:1px solid var(--bd);padding-top:16px;margin-top:4px}
+.img-preview{margin-top:10px;border-radius:var(--rs);overflow:hidden;border:1.5px solid var(--bd);display:none}
+.img-preview img{width:100%;display:block;max-height:200px;object-fit:cover}
+
+/* TEMPLATE SECTION */
+.tpl-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
+.tpl-card{padding:12px;border-radius:var(--rs);border:1.5px solid var(--bd);cursor:pointer;transition:all .13s;background:var(--s)}
+.tpl-card:hover{border-color:var(--g);background:var(--gp)}
+.tpl-ico{font-size:20px;margin-bottom:5px}
+.tpl-name{font-size:12.5px;font-weight:700;color:var(--t)}
+.tpl-desc{font-size:11px;color:var(--t3);margin-top:2px}
+
+/* BROADCAST */
+.bcast-info{display:flex;align-items:center;gap:10px;padding:12px 14px;background:#fffbeb;border:1.5px solid #fde68a;border-radius:var(--rs);margin-bottom:14px}
+.bcast-icon{font-size:18px}
+.bcast-text{font-size:12.5px;color:#92400e;font-weight:500}
+
+/* SEND */
+.send-wrap{margin-top:18px}
+.btn-send{width:100%;padding:13px;border-radius:var(--rs);border:none;background:var(--g);color:#fff;font-family:'Sarabun',sans-serif;font-size:16px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:all .15s;letter-spacing:-.1px;box-shadow:0 2px 10px rgba(6,199,85,.3)}
+.btn-send:hover{background:var(--gd);box-shadow:0 4px 16px rgba(6,199,85,.4);transform:translateY(-1px)}
+.btn-send:active{transform:translateY(0);box-shadow:none}
+.btn-send:disabled{opacity:.45;cursor:not-allowed;transform:none;box-shadow:none}
+@keyframes spin{to{transform:rotate(360deg)}}
+.spin{width:17px;height:17px;border:2.5px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite}
+
+/* HISTORY */
+.hlist{display:flex;flex-direction:column;gap:6px;max-height:220px;overflow-y:auto}
+.hi{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:var(--rxs);border:1px solid;font-size:12.5px}
+.hi.ok{background:var(--gp);border-color:var(--gm)}
+.hi.err{background:var(--rp);border-color:var(--rm)}
+.hi-ico{font-size:13px;flex-shrink:0}
+.hi-name{flex:1;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.hi-dept{font-size:11px;color:var(--t3);flex-shrink:0}
+.hi-st{font-size:11.5px;font-weight:700;flex-shrink:0;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.hi.ok .hi-st{color:var(--gd)}
+.hi.err .hi-st{color:var(--red)}
+.hi-t{font-size:11px;color:var(--t3);flex-shrink:0}
+.hi-mode{font-size:10px;background:var(--s3);padding:1px 7px;border-radius:100px;color:var(--t3);flex-shrink:0}
+
+/* TOAST */
+.tray{position:fixed;bottom:22px;right:22px;z-index:9999;display:flex;flex-direction:column;gap:8px;pointer-events:none}
+.toast{padding:12px 20px;border-radius:var(--rs);font-size:13.5px;font-weight:600;box-shadow:var(--shd);pointer-events:auto;display:flex;align-items:center;gap:8px;animation:tin .25s ease both}
+@keyframes tin{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.tst-ok{background:#0d1117;color:#fff}
+.tst-err{background:var(--red);color:#fff}
+.tst-info{background:var(--blue);color:#fff}
+
+/* MISC */
+.btn-sm{display:inline-flex;align-items:center;gap:4px;padding:5px 12px;border-radius:var(--rxs);border:1.5px solid var(--bd2);background:var(--s);font-family:'Sarabun',sans-serif;font-size:12.5px;font-weight:600;color:var(--t2);cursor:pointer;transition:all .12s}
+.btn-sm:hover{border-color:var(--g);color:var(--g);background:var(--gp)}
+.divider{height:1px;background:var(--bd);margin:14px 0}
+.badge-count{display:inline-flex;align-items:center;justify-content:center;background:var(--g);color:#fff;font-size:11px;font-weight:700;width:20px;height:20px;border-radius:50%;margin-left:4px}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="logo">
+    <div class="logo-box">
+      <svg viewBox="0 0 24 24"><path d="M19.365 9.863c.349 0 .63.285.63.631 0 .345-.281.63-.63.63H17.61v1.125h1.755c.349 0 .63.283.63.63 0 .344-.281.629-.63.629h-2.386c-.345 0-.627-.285-.627-.629V8.108c0-.345.282-.63.627-.63h2.386c.349 0 .63.285.63.63 0 .349-.281.63-.63.63H17.61v1.125h1.755zm-3.855 3.016c0 .27-.174.51-.432.596-.064.021-.133.031-.199.031-.211 0-.391-.09-.51-.25l-2.443-3.317v2.94c0 .344-.279.629-.631.629-.346 0-.626-.285-.626-.629V8.108c0-.27.173-.51.43-.595.06-.023.136-.033.194-.033.195 0 .375.104.495.254l2.462 3.33V8.108c0-.345.282-.63.63-.63.345 0 .63.285.63.63v4.771zm-5.741 0c0 .344-.282.629-.631.629-.345 0-.627-.285-.627-.629V8.108c0-.345.282-.63.627-.63.349 0 .631.285.631.63v4.771zm-2.466.629H4.917c-.345 0-.63-.285-.63-.629V8.108c0-.345.285-.63.63-.63.348 0 .63.285.63.63v4.141h1.756c.348 0 .629.283.629.63 0 .344-.281.629-.629.629M24 10.314C24 4.943 18.615.572 12 .572S0 4.943 0 10.314c0 4.811 4.27 8.842 10.035 9.608.391.082.923.258 1.058.59.12.301.079.766.038 1.08l-.164 1.02c-.045.301-.24 1.186 1.049.645 1.291-.539 6.916-4.078 9.436-6.975C23.176 14.393 24 12.458 24 10.314"/></svg>
+    </div>
+    <div class="logo-text">LINE Sender <em>Pro Edition</em></div>
+  </div>
+  <div class="conn-pill" id="pill">
+    <div class="cdot" id="cdot"></div>
+    <span id="clbl">กำลังเชื่อมต่อ...</span>
+  </div>
+</nav>
+
+<div class="wrap">
+
+  <!-- ═══ LEFT PANEL ═══ -->
+  <div class="panel">
+    <div class="box">
+      <div class="bh">
+        <div class="bh-ico" style="background:#f0fdf4">🔍</div>
+        <span class="bh-title">ค้นหาผู้รับ</span>
+        <span class="bh-extra" id="sel-count-nav"></span>
+      </div>
+      <div class="bb">
+        <div class="srch">
+          <div class="srch-ico">
+            <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          </div>
+          <input id="si" type="text" placeholder="กำลังโหลด..." oninput="onSearch()" autocomplete="off" disabled />
+          <button class="srch-x" id="sx" onclick="clearS()">×</button>
+        </div>
+        <div class="mlist" id="mlist">
+          <div class="empty"><div class="ei">⏳</div>กำลังเชื่อมต่อ...</div>
+        </div>
+        <div class="tags" id="tags"></div>
+      </div>
+    </div>
+
+    <!-- ═ HISTORY BOX ═ -->
+    <div class="box" id="hbox" style="display:none">
+      <div class="bh">
+        <div class="bh-ico" style="background:#f0fdf4">📋</div>
+        <span class="bh-title">ประวัติการส่ง</span>
+        <button class="btn-sm" style="margin-left:auto" onclick="clrHist()">ล้าง</button>
+      </div>
+      <div class="bb" style="padding:12px 18px">
+        <div class="hlist" id="hlist"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ RIGHT PANEL ═══ -->
+  <div class="panel">
+    <div class="box">
+      <div class="bh">
+        <div class="bh-ico" style="background:#fffbeb">✉️</div>
+        <span class="bh-title">เขียนข้อความ</span>
+        <span class="bh-extra" id="mode-label">ข้อความธรรมดา</span>
+      </div>
+      <div class="bb">
+
+        <!-- DRAFT PILLS -->
+        <div id="dw" style="display:none">
+          <label>ข้อความร่าง (จาก Sheet Drafts)</label>
+          <div class="draft-row" id="dpills"></div>
+        </div>
+
+        <!-- MODE TABS — 4 โหมด -->
+        <div class="mode-tabs">
+          <button class="mt on" id="m-text"     onclick="setMode('text')">💬<br>ข้อความ</button>
+          <button class="mt"    id="m-flex"     onclick="setMode('flex')">🎨<br>การ์ด Flex</button>
+          <button class="mt"    id="m-image"    onclick="setMode('image')">🖼️<br>รูปภาพ</button>
+          <button class="mt"    id="m-template" onclick="setMode('template')">⚡<br>Quick Send</button>
+        </div>
+
+        <!-- ─── TEMPLATE MODE ─── -->
+        <div id="sec-template" style="display:none">
+          <div class="bcast-info">
+            <div class="bcast-icon">⚡</div>
+            <div class="bcast-text">เลือก Template สำเร็จรูป แล้วกดส่งได้เลย ไม่ต้องพิมพ์</div>
+          </div>
+          <div class="tpl-grid" id="tpl-grid"></div>
+          <div class="divider"></div>
+        </div>
+
+        <!-- ─── MESSAGE FIELD (ทุก mode) ─── -->
+        <div class="field">
+          <label>ข้อความ <span id="msg-hint" style="font-weight:400;color:var(--t3)"></span></label>
+          <textarea id="msg" placeholder="พิมพ์ข้อความ..." oninput="onMsg()"></textarea>
+          <div class="msg-meta">
+            <span class="cc" id="cc">0 ตัวอักษร</span>
+            <div class="hint-chips">
+              <span class="chip" onclick="ins('{{ชื่อ}}')">+ {{ชื่อ}}</span>
+              <span class="chip" onclick="ins('{{ฝ่าย}}')">+ {{ฝ่าย}}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- ─── FLEX OPTIONS ─── -->
+        <div id="sec-flex" style="display:none" class="flex-section">
+
+          <!-- Header Title แก้ได้อิสระ -->
+          <div class="field">
+            <label>หัวข้อการ์ด (แก้ได้อิสระ)</label>
+            <input type="text" id="cardHeader" placeholder="เช่น 📢 ประกาศด่วน / 🎉 ยินดีด้วย!" oninput="updPrev()" />
+          </div>
+
+          <div class="field">
+            <label>สีส่วนหัวการ์ด</label>
+            <div class="color-grid" id="cg"></div>
+          </div>
+
+          <!-- Link Button Toggle -->
+          <div class="field">
+            <div class="link-toggle" id="link-toggle" onclick="toggleLink()">
+              <span class="lt-ico">🔗</span>
+              <span class="lt-label">เพิ่มปุ่มลิงค์</span>
+              <span class="lt-badge">เปิดใช้งาน</span>
+              <span style="font-size:18px;color:var(--t3)" id="lt-arrow">＋</span>
+            </div>
+            <div class="link-body" id="link-body">
+              <div style="margin-top:10px">
+                <div class="link-row">
+                  <div>
+                    <label>ข้อความบนปุ่ม</label>
+                    <input type="text" id="linkLabel" placeholder="เช่น ดูรายละเอียด / คลิกที่นี่" oninput="updPrev()" />
+                  </div>
+                  <button class="btn-del-link" onclick="removeLink()">🗑 ลบลิงค์</button>
+                </div>
+                <div style="margin-top:10px">
+                  <label>URL ลิงค์</label>
+                  <input type="url" id="linkUrl" placeholder="https://..." oninput="updPrev()" />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="field">
+            <label>ข้อความ Footer (ไม่บังคับ)</label>
+            <input type="text" id="footer" placeholder="เช่น ส่งโดยฝ่าย HR · วันที่ 1 ม.ค. 2568" oninput="updPrev()" />
+          </div>
+
+          <!-- PREVIEW -->
+          <div class="prev-wrap">
+            <div class="prev-lbl">ตัวอย่างการ์ด</div>
+            <div class="flex-card">
+              <div class="fc-hd" id="fhd" style="background:#06C755">
+                <div class="fc-hd-sub" id="fhd-sub">📨 ข้อความถึง</div>
+                <div class="fc-hd-name" id="fhd-name">ชื่อผู้รับ</div>
+                <div class="fc-hd-dept" id="fhd-dept"></div>
+              </div>
+              <div class="fc-body" id="fbody">เนื้อหาข้อความจะแสดงที่นี่</div>
+              <div class="fc-link" id="fc-link">
+                <div class="fc-link-btn" id="fc-link-btn" style="background:#06C755">ดูรายละเอียด</div>
+              </div>
+              <div class="fc-foot" id="ffoot" style="display:none"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ─── IMAGE OPTIONS ─── -->
+        <div id="sec-image" style="display:none" class="img-section">
+          <div class="field">
+            <label>URL รูปภาพ (https://...)</label>
+            <input type="url" id="imageUrl" placeholder="https://example.com/image.jpg" oninput="onImgUrl()" />
+            <div class="img-preview" id="img-preview">
+              <img id="img-thumb" src="" alt="preview" />
+            </div>
+            <div style="margin-top:8px;font-size:12px;color:var(--t3)">💡 ข้อความด้านบนจะส่งเป็น caption ต่อจากรูป</div>
+          </div>
+        </div>
+
+        <!-- SEND BUTTON -->
+        <div class="send-wrap">
+          <button class="btn-send" id="sbtn" onclick="doSend()" disabled>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+            ส่งข้อความ
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="tray" id="tray"></div>
+
+<script>
+// ════════════════════════════════════════════
+//  ★ แก้ตรงนี้: ใส่ GAS Web App URL ★
+// ════════════════════════════════════════════
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbzxSatew5D2A4RG3lMGH5xnHGzRJSjX04JkKP5hKZymJ1Ivf9SVM5GB0xAn-qS61ww8/exec';
+
+// ══════════════ QUICK TEMPLATES ══════════════
+const TEMPLATES = [
+  { icon:'📢', name:'ประกาศด่วน', desc:'แจ้งข่าวสำคัญ',
+    header:'📢 ประกาศสำคัญ', color:'#ef4444',
+    msg:'เรียน {{ชื่อ}}\n\nมีประกาศสำคัญจากทีมงาน กรุณาอ่านและปฏิบัติตามโดยด่วน\n\nขอบคุณครับ/ค่ะ' },
+  { icon:'🎉', name:'ยินดีด้วย', desc:'ส่งคำอวยพร',
+    header:'🎉 ยินดีด้วย!', color:'#f59e0b',
+    msg:'ยินดีด้วยนะครับ/ค่ะ คุณ {{ชื่อ}} 🎊\n\nขอแสดงความยินดีในโอกาสพิเศษนี้ด้วยใจจริง\nหวังว่าจะมีความสุขและประสบความสำเร็จเสมอไปครับ/ค่ะ' },
+  { icon:'📅', name:'นัดประชุม', desc:'แจ้งนัดหมาย',
+    header:'📅 แจ้งนัดประชุม', color:'#3b82f6',
+    msg:'เรียน {{ชื่อ}}\n\nขอแจ้งนัดประชุมในวันที่ ______\nเวลา ______ น. ณ ______\n\nกรุณายืนยันการเข้าร่วมด้วยครับ/ค่ะ' },
+  { icon:'⚠️', name:'แจ้งเตือน', desc:'เตือนกำหนดการ',
+    header:'⚠️ แจ้งเตือน', color:'#8b5cf6',
+    msg:'เรียน {{ชื่อ}}\n\nขอแจ้งเตือนว่ากำหนดส่ง ______ ใกล้มาถึงแล้ว\nโปรดดำเนินการให้แล้วเสร็จภายใน ______\n\nขอบคุณครับ/ค่ะ' },
+  { icon:'🙏', name:'ขอบคุณ', desc:'ส่งคำขอบคุณ',
+    header:'🙏 ขอบคุณ', color:'#0ea5e9',
+    msg:'ขอบคุณมากครับ/ค่ะ คุณ {{ชื่อ}}\n\nขอบคุณสำหรับความช่วยเหลือและความร่วมมือที่ดีเสมอมา\nทีมงานซาบซึ้งใจมากครับ/ค่ะ 😊' },
+  { icon:'📝', name:'ส่งงาน', desc:'แจ้งส่งงาน',
+    header:'📝 แจ้งส่งงาน', color:'#06C755',
+    msg:'เรียน {{ชื่อ}}\n\nขอแจ้งว่าได้ส่งงาน ______ เรียบร้อยแล้ว\nหากมีข้อแก้ไขประการใด กรุณาแจ้งกลับมาด้วยครับ/ค่ะ' },
+];
+
+// ══════════════ STATE ══════════════
+let connected  = false;
+let selected   = [];
+let drafts     = [];
+let mode       = 'text';
+let color      = '#06C755';
+let history    = [];
+let stimer     = null;
+let linkActive = false;
+
+const COLORS     = ['#06C755','#3b82f6','#f59e0b','#ef4444','#8b5cf6','#ec4899','#0ea5e9','#1e293b'];
+const AVA_COLORS = ['#06C755','#3b82f6','#f59e0b','#8b5cf6','#ec4899','#0ea5e9','#e11d48','#0d9488'];
+
+// ══════════════ INIT ══════════════
+window.onload = () => {
+  buildColors();
+  buildTemplates();
+  init();
+};
+
+async function init() {
+  try {
+    const r = await gasGet('getMembers', { q: '' });
+    connected = true;
+    setConn(true, `เชื่อมต่อแล้ว · ${r.members.length} คนในระบบ`);
+    document.getElementById('si').disabled    = false;
+    document.getElementById('si').placeholder = 'ค้นชื่อ หรือ ฝ่าย/ที่...';
+    renderList([]);
+    loadDrafts();
+  } catch(e) {
+    setConn(false, 'เชื่อมต่อไม่สำเร็จ');
+    document.getElementById('mlist').innerHTML =
+      `<div class="empty"><div class="ei">⚠️</div>เชื่อมต่อ GAS ไม่ได้<br><small style="color:var(--red)">${esc(e.message)}</small></div>`;
+  }
+}
+
+function setConn(ok, label) {
+  document.getElementById('cdot').className   = 'cdot' + (ok ? ' live' : '');
+  document.getElementById('clbl').textContent = label;
+  document.getElementById('pill').className   = 'conn-pill' + (ok ? ' ok' : '');
+}
+
+// ══════════════ GAS FETCH (GET — หลีกเลี่ยง CORS preflight) ══════════════
+async function gasGet(action, params = {}) {
+  // encode ทุก value เป็น string เพื่อส่งใน query string
+  const flat = {};
+  for (const [k, v] of Object.entries({ action, ...params })) {
+    flat[k] = String(v);
+  }
+  const qs  = new URLSearchParams(flat);
+  const res = await fetch(GAS_URL + '?' + qs);
+  if (!res.ok) throw new Error('HTTP ' + res.status);
+  const d = await res.json();
+  if (!d.ok) throw new Error(d.error || 'GAS error');
+  return d;
+}
+
+// ══════════════ SEARCH ══════════════
+function onSearch() {
+  const q = document.getElementById('si').value;
+  document.getElementById('sx').className = 'srch-x' + (q ? ' on' : '');
+  if (!connected) return;
+  clearTimeout(stimer);
+  stimer = setTimeout(() => search(q), 200);
+}
+
+async function search(q) {
+  if (!q.trim()) { renderList([]); return; }
+  try {
+    const r = await gasGet('getMembers', { q });
+    renderList(r.members || []);
+  } catch(e) { toast('ค้นหาผิดพลาด: ' + e.message, 'err'); }
+}
+
+function renderList(list) {
+  const box = document.getElementById('mlist');
+  if (!list.length && document.getElementById('si').value) {
+    box.innerHTML = '<div class="empty"><div class="ei">🔍</div>ไม่พบรายชื่อ</div>'; return;
+  }
+  if (!list.length) {
+    box.innerHTML = '<div class="empty"><div class="ei">👆</div>พิมพ์ชื่อหรือฝ่ายเพื่อค้นหา</div>'; return;
+  }
+  box.innerHTML = '';
+  list.slice(0, 25).forEach(m => {
+    const isSel = selected.some(s => s.userId === m.userId);
+    const bg    = AVA_COLORS[(m.name.charCodeAt(0) || 0) % AVA_COLORS.length];
+    const init  = [...m.name][0] || '?';
+    const el    = document.createElement('div');
+    el.className = 'mcard' + (isSel ? ' sel' : '');
+    el.innerHTML = `
+      <div class="ava" style="background:${bg}">${esc(init)}</div>
+      <div class="minfo">
+        <div class="mname">${esc(m.name)}</div>
+        ${m.dept ? `<div class="mdept">${esc(m.dept)}</div>` : ''}
+        <div class="muid">${esc(m.userId)}</div>
+      </div>
+      <div class="mchk"><svg viewBox="0 0 12 10"><polyline points="1,5.5 4.5,9 11,1"/></svg></div>`;
+    el.onclick = () => toggle(m, el);
+    box.appendChild(el);
+  });
+}
+
+function toggle(m, el) {
+  const i = selected.findIndex(s => s.userId === m.userId);
+  if (i > -1) { selected.splice(i, 1); el.classList.remove('sel'); }
+  else         { selected.push(m);      el.classList.add('sel'); }
+  renderTags(); updBtn(); updPrev();
+}
+
+function renderTags() {
+  document.getElementById('tags').innerHTML = selected.map(m =>
+    `<div class="tag">${esc(m.name)}${m.dept ? ` <span style="opacity:.6;font-weight:400">(${esc(m.dept)})</span>` : ''}<span class="tx" onclick="rem('${esc(m.userId)}')">×</span></div>`
+  ).join('');
+  const n = selected.length;
+  document.getElementById('sel-count-nav').textContent = n ? `เลือก ${n} คน` : '';
+}
+
+function rem(uid) {
+  selected = selected.filter(s => s.userId !== uid);
+  renderTags(); updBtn(); updPrev();
+  document.querySelectorAll('.mcard').forEach(c => {
+    if (c.querySelector('.muid')?.textContent === uid) c.classList.remove('sel');
+  });
+}
+
+function clearS() {
+  document.getElementById('si').value = '';
+  document.getElementById('sx').className = 'srch-x';
+  renderList([]);
+}
+
+// ══════════════ DRAFTS ══════════════
+async function loadDrafts() {
+  try {
+    const r = await gasGet('getDrafts');
+    drafts = r.drafts || [];
+    const dw = document.getElementById('dw');
+    if (!drafts.length) { dw.style.display = 'none'; return; }
+    dw.style.display = '';
+    document.getElementById('dpills').innerHTML = drafts.map(d =>
+      `<div class="dp" data-id="${d.id}" onclick="useDraft(${d.id})">${esc(d.title)}</div>`
+    ).join('');
+  } catch(_) {}
+}
+
+function useDraft(id) {
+  const d = drafts.find(x => x.id === id);
+  if (!d) return;
+  document.getElementById('msg').value = d.content;
+  onMsg();
+  document.querySelectorAll('.dp').forEach(p => p.classList.toggle('on', +p.dataset.id === id));
+}
+
+// ══════════════ TEMPLATES ══════════════
+function buildTemplates() {
+  const grid = document.getElementById('tpl-grid');
+  TEMPLATES.forEach((t, i) => {
+    const d = document.createElement('div');
+    d.className = 'tpl-card';
+    d.innerHTML = `<div class="tpl-ico">${t.icon}</div><div class="tpl-name">${esc(t.name)}</div><div class="tpl-desc">${esc(t.desc)}</div>`;
+    d.onclick = () => applyTemplate(i);
+    grid.appendChild(d);
+  });
+}
+
+function applyTemplate(i) {
+  const t = TEMPLATES[i];
+  document.getElementById('msg').value        = t.msg;
+  document.getElementById('cardHeader').value = t.header || '';
+  color = t.color;
+  document.querySelectorAll('.sw').forEach(s =>
+    s.classList.toggle('on', s.style.background === t.color || s.style.background === toRgb(t.color))
+  );
+  // สลับไปโหมด flex อัตโนมัติ
+  setMode('flex');
+  onMsg();
+  toast(`โหลด Template "${t.name}" แล้ว`, 'ok');
+}
+
+// ══════════════ MODE ══════════════
+const MODE_LABELS = {
+  text:     'ข้อความธรรมดา',
+  flex:     'การ์ด Flex',
+  image:    'รูปภาพ + Caption',
+  template: 'Quick Send'
+};
+
+function setMode(m) {
+  mode = m;
+  ['text','flex','image','template'].forEach(x => {
+    document.getElementById('m-' + x).className = 'mt' + (x === m ? ' on' : '');
+  });
+  document.getElementById('sec-flex').style.display     = m === 'flex'     ? '' : 'none';
+  document.getElementById('sec-image').style.display    = m === 'image'    ? '' : 'none';
+  document.getElementById('sec-template').style.display = m === 'template' ? '' : 'none';
+  document.getElementById('mode-label').textContent = MODE_LABELS[m] || '';
+
+  const hint = document.getElementById('msg-hint');
+  hint.textContent = m === 'image' ? '(Caption ต่อจากรูป)' : '';
+
+  if (m === 'template') {
+    document.getElementById('msg').placeholder = 'เนื้อหาจะถูก Fill อัตโนมัติเมื่อเลือก Template ด้านบน...';
+  } else if (m === 'image') {
+    document.getElementById('msg').placeholder = 'Caption (ข้อความกำกับรูป) — ไม่บังคับ';
+  } else {
+    document.getElementById('msg').placeholder = 'พิมพ์ข้อความ...';
+  }
+  updPrev();
+}
+
+// ══════════════ COMPOSE ══════════════
+function onMsg() {
+  const v = document.getElementById('msg').value;
+  document.getElementById('cc').textContent = v.length + ' ตัวอักษร';
+  updPrev(); updBtn();
+  document.querySelectorAll('.dp').forEach(p => p.classList.remove('on'));
+}
+
+function ins(v) {
+  const ta = document.getElementById('msg');
+  const p  = ta.selectionStart;
+  ta.value = ta.value.slice(0, p) + v + ta.value.slice(p);
+  ta.selectionStart = ta.selectionEnd = p + v.length;
+  ta.focus(); onMsg();
+}
+
+function buildColors() {
+  const cg = document.getElementById('cg');
+  COLORS.forEach(c => {
+    const d = document.createElement('div');
+    d.className = 'sw' + (c === color ? ' on' : '');
+    d.style.background = c;
+    d.onclick = () => pickColor(c);
+    cg.appendChild(d);
+  });
+}
+
+function pickColor(c) {
+  color = c;
+  document.querySelectorAll('.sw').forEach(s =>
+    s.classList.toggle('on', s.style.background === c || s.style.background === toRgb(c))
+  );
+  updPrev();
+}
+
+function toRgb(hex) {
+  if (!hex || hex[0] !== '#') return hex;
+  const n = parseInt(hex.slice(1), 16);
+  return `rgb(${(n>>16)&255}, ${(n>>8)&255}, ${n&255})`;
+}
+
+// ══════════════ LINK TOGGLE ══════════════
+function toggleLink() {
+  linkActive = !linkActive;
+  const tog  = document.getElementById('link-toggle');
+  const body = document.getElementById('link-body');
+  const arr  = document.getElementById('lt-arrow');
+  tog.classList.toggle('on', linkActive);
+  body.classList.toggle('show', linkActive);
+  arr.textContent = linkActive ? '－' : '＋';
+  if (!linkActive) {
+    document.getElementById('linkUrl').value   = '';
+    document.getElementById('linkLabel').value = '';
+  }
+  updPrev();
+}
+
+function removeLink() {
+  linkActive = false;
+  document.getElementById('link-toggle').classList.remove('on');
+  document.getElementById('link-body').classList.remove('show');
+  document.getElementById('lt-arrow').textContent = '＋';
+  document.getElementById('linkUrl').value   = '';
+  document.getElementById('linkLabel').value = '';
+  updPrev();
+}
+
+// ══════════════ IMAGE PREVIEW ══════════════
+function onImgUrl() {
+  const url  = document.getElementById('imageUrl').value.trim();
+  const prev = document.getElementById('img-preview');
+  const img  = document.getElementById('img-thumb');
+  if (url) {
+    img.src = url;
+    prev.style.display = '';
+    img.onerror = () => { prev.style.display = 'none'; };
+  } else {
+    prev.style.display = 'none';
+  }
+  updBtn();
+}
+
+// ══════════════ PREVIEW ══════════════
+function updPrev() {
+  if (mode !== 'flex') return;
+  const m    = selected[0] || { name: 'ชื่อผู้รับ', dept: '' };
+  const raw  = document.getElementById('msg').value || 'เนื้อหาข้อความจะแสดงที่นี่';
+  const txt  = raw.replace(/{{ชื่อ}}/g, m.name).replace(/{{ฝ่าย}}/g, m.dept).replace(/{{ที่}}/g, m.dept);
+  const hdr  = document.getElementById('cardHeader')?.value || '📨 ข้อความถึง';
+  const foot = document.getElementById('footer')?.value || '';
+  const lurl = linkActive ? (document.getElementById('linkUrl')?.value || '') : '';
+  const llbl = document.getElementById('linkLabel')?.value || 'ดูรายละเอียด';
+
+  document.getElementById('fhd').style.background  = color;
+  document.getElementById('fhd-sub').textContent   = hdr;
+  document.getElementById('fhd-name').textContent  = m.name;
+  const de = document.getElementById('fhd-dept');
+  de.textContent   = m.dept;
+  de.style.display = m.dept ? '' : 'none';
+  document.getElementById('fbody').textContent = txt;
+
+  // link button preview
+  const fcLink    = document.getElementById('fc-link');
+  const fcLinkBtn = document.getElementById('fc-link-btn');
+  if (lurl) {
+    fcLink.classList.add('show');
+    fcLinkBtn.textContent      = llbl;
+    fcLinkBtn.style.background = color;
+  } else {
+    fcLink.classList.remove('show');
+  }
+
+  const fe = document.getElementById('ffoot');
+  fe.style.display = foot ? '' : 'none';
+  fe.textContent   = foot;
+}
+
+function updBtn() {
+  const msg = document.getElementById('msg').value.trim();
+  const hasImg = mode === 'image' ? !!document.getElementById('imageUrl').value.trim() : true;
+  const ok  = connected && selected.length > 0 && (msg || mode === 'image') && (mode !== 'image' || hasImg);
+  document.getElementById('sbtn').disabled = !ok;
+}
+
+// ══════════════ SEND ══════════════
+async function doSend() {
+  const msgVal = document.getElementById('msg').value.trim();
+  if (!selected.length) return;
+  if (mode !== 'image' && !msgVal) return;
+  if (!confirm(`ส่งข้อความไปยัง ${selected.length} คน?`)) return;
+
+  const btn = document.getElementById('sbtn');
+  btn.disabled = true;
+  btn.innerHTML = `<span class="spin"></span> กำลังส่ง ${selected.length} คน...`;
+
+  const foot  = document.getElementById('footer')?.value || '';
+  const hdr   = document.getElementById('cardHeader')?.value || '📨 ข้อความถึง';
+  const lurl  = linkActive ? (document.getElementById('linkUrl')?.value || '') : '';
+  const llbl  = document.getElementById('linkLabel')?.value || 'ดูรายละเอียด';
+  const imgU  = document.getElementById('imageUrl')?.value || '';
+
+  // template mode ส่งเป็น flex
+  const sendMode = mode === 'template' ? 'flex' : mode;
+
+  let ok = 0, err = 0;
+
+  for (const m of selected) {
+    try {
+      await gasGet('sendMessage', {
+        userId:      m.userId,
+        name:        m.name,
+        dept:        m.dept || '',
+        message:     msgVal,
+        mode:        sendMode,
+        cardColor:   color,
+        cardHeader:  hdr,
+        cardFooter:  foot,
+        linkUrl:     lurl,
+        linkLabel:   llbl,
+        imageUrl:    imgU,
+      });
+      addHist(m, true, '', sendMode);
+      ok++;
+    } catch(e) {
+      addHist(m, false, e.message, sendMode);
+      err++;
+    }
+    await sleep(300);
+  }
+
+  btn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg> ส่งข้อความ`;
+  btn.disabled  = false;
+
+  if (err === 0) toast(`✓ ส่งสำเร็จ ${ok} คน`, 'ok');
+  else           toast(`สำเร็จ ${ok} · ผิดพลาด ${err}`, 'err');
+}
+
+function addHist(m, success, errMsg = '', modeUsed = '') {
+  const modeMap = { text:'ข้อความ', flex:'การ์ด', image:'รูป', template:'การ์ด' };
+  history.unshift({
+    name: m.name, dept: m.dept || '',
+    success, errMsg, modeUsed: modeMap[modeUsed] || modeUsed,
+    time: new Date().toTimeString().slice(0, 5)
+  });
+  document.getElementById('hbox').style.display = '';
+  document.getElementById('hlist').innerHTML = history.slice(0, 40).map(h => `
+    <div class="hi ${h.success ? 'ok' : 'err'}">
+      <span class="hi-ico">${h.success ? '✓' : '✗'}</span>
+      <span class="hi-name">${esc(h.name)}</span>
+      <span class="hi-dept">${esc(h.dept)}</span>
+      <span class="hi-mode">${esc(h.modeUsed)}</span>
+      <span class="hi-st">${h.success ? 'สำเร็จ' : 'ผิดพลาด' + (h.errMsg ? ': ' + h.errMsg : '')}</span>
+      <span class="hi-t">${h.time}</span>
+    </div>`).join('');
+}
+
+function clrHist() {
+  history = [];
+  document.getElementById('hbox').style.display = 'none';
+}
+
+// ══════════════ TOAST ══════════════
+function toast(msg, type = 'ok') {
+  const el = document.createElement('div');
+  el.className   = 'toast tst-' + type;
+  el.textContent = msg;
+  document.getElementById('tray').appendChild(el);
+  setTimeout(() => el.remove(), 3200);
+}
+
+function esc(s)    { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+</script>
+</body>
+</html>
